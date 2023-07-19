@@ -10,10 +10,10 @@ const LS_KEY = 'contacts';
 class App extends Component {
   state = {
     contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+      // { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+      // { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+      // { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+      // { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
     ],
     filter: '',
     showModal: false,
@@ -31,6 +31,13 @@ class App extends Component {
 
     if (prevState.contacts !== currState) {
       localStorage.setItem(LS_KEY, JSON.stringify(currState));
+    }
+
+    if (
+      this.state.contacts.length > prevState.contacts.length &&
+      prevState.contacts.length !== 0
+    ) {
+      this.toggleModal();
     }
   }
 
@@ -67,12 +74,12 @@ class App extends Component {
       filter: evt.currentTarget.value,
     });
   };
-  
+
   toggleModal = () => {
     this.setState(prevState => ({
-      showModal: !prevState.showModal
-    }))
-  }
+      showModal: !prevState.showModal,
+    }));
+  };
 
   render() {
     const { contacts, filter } = this.state;
