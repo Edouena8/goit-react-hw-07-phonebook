@@ -1,75 +1,58 @@
+import { Field, Form, Formik, ErrorMessage } from 'formik';
 import PropTypes from 'prop-types';
-import { Component } from 'react';
+import * as Yup from 'yup';
 
-class ContactForm extends Component {
-  state = {
-    name: '',
-    number: '',
-  };
+const SignupSchema = Yup.object().shape({
+  name: Yup.string(
+    "Name main y contaonly letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
+  ).required('Name is a required field'),
 
-  handleInputChange = evt => {
-    const { name, value } = evt.currentTarget;
+  number: Yup.string(
+    'Phone number must be digits and can contain spaces, dashes, parentheses and can start with +'
+  )
+    .min(3, 'Number must be at least 3 characters!')
+    .max(10, 'Number must be at most 10 characters!')
+    .required('Number is a required field'),
+});
 
-    this.setState({
-      [name]: value,
-    });
-  };
+const initialValues = {
+  name: '',
+  number: '',
+};
 
-  handleSubmit = evt => {
-    evt.preventDefault();
-    const {name, number} = this.state;
-    const {onSubmit} = this.props;
-
+const ContactForm = ({ onSubmit }) => {
+  const handleSubmit = ({ name, number }, { resetForm }) => {
     onSubmit(name, number);
-    this.reset();
+    resetForm();
   };
 
-  reset = () => {
-    this.setState({
-      name: '',
-      number: '',
-    });
-  };
-
-  render() {
-    const {name, number} = this.state;
-
-    return (
-      <form onSubmit={this.handleSubmit}>
+  return (
+    <Formik
+      initialValues={initialValues}
+      validationSchema={SignupSchema}
+      onSubmit={handleSubmit}
+    >
+      <Form>
         <label>
           Name
-          <input
-            type="text"
-            name="name"
-            value={name}
-            onChange={this.handleInputChange}
-            pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-            title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-            required
-          />
+          <Field type="text" name="name" />
+          <ErrorMessage name="name" component="p" />
         </label>
 
         <label>
           Number
-          <input
-            type="tel"
-            name="number"
-            value={number}
-            onChange={this.handleInputChange}
-            pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-            title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-            required
-          />
+          <Field type="tel" name="number" />
+          <ErrorMessage name="number" component="p" />
         </label>
 
         <button type="submit">Add contact</button>
-      </form>
-    );
-  };
+      </Form>
+    </Formik>
+  );
 };
 
 ContactForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
-}
+};
 
 export default ContactForm;
