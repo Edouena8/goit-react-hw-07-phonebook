@@ -1,5 +1,6 @@
 import shortid from 'shortid';
-import { Component } from 'react';
+import { useState } from 'react';
+import useLocalStorage from 'hooks/useLocalStorage';
 import ContactList from './ContactList/ContactList';
 import ContactForm from './ContactForm/ContactForm';
 import Filter from './Filter/Filter';
@@ -7,48 +8,21 @@ import Modal from './Modal/Modal';
 
 const LS_KEY = 'contacts';
 
-class App extends Component {
-  state = {
-    contacts: [
-      // { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      // { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      // { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      // { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
-    filter: '',
-    showModal: false,
-  };
+export default function App() {
+  const [contacts, setContacts] = useLocalStorage(LS_KEY, []);
+  const [filter, setFilter] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
-  componentDidMount() {
-    const contacts = localStorage.getItem(LS_KEY);
-    const normalizedContacts = JSON.parse(contacts);
-
-    this.setState({ contacts: normalizedContacts });
-  }
-
-  componentDidUpdate(_, prevState) {
-    const currState = this.state.contacts;
-
-    if (prevState.contacts !== currState) {
-      localStorage.setItem(LS_KEY, JSON.stringify(currState));
-    }
-
-    if (
-      this.state.contacts.length > prevState.contacts.length &&
-      prevState.contacts.length !== 0
-    ) {
-      this.toggleModal();
-    }
-  }
-
-  addContact = (name, number) => {
-    const { contacts } = this.state;
+  const duplicateContact = name => {
     const normalizedName = name.toLowerCase().trim();
-    const isPresent = contacts.some(
+
+    return contacts.some(
       contact => contact.name.toLowerCase() === normalizedName
     );
+  };
 
-    if (isPresent) {
+  const addContact = (name, number) => {
+    if (duplicateContact) {
       return alert(`${name} is already in contacts`);
     }
 
@@ -58,57 +32,44 @@ class App extends Component {
       number,
     };
 
-    this.setState(({ contacts }) => ({
-      contacts: [contact, ...contacts],
-    }));
+    setContacts(prevContacts => [contact, ...prevContacts]);
   };
 
-  deleteContact = contactId => {
-    this.setState(({ contacts }) => ({
-      contacts: contacts.filter(({ id }) => id !== contactId),
-    }));
-  };
+  const deleteContact = contactId =>
+    setContacts(prevContacts =>
+      prevContacts.filter(({ id }) => id !== contactId)
+    );
 
-  handleFilter = evt => {
-    this.setState({
-      filter: evt.currentTarget.value,
-    });
-  };
+  const handleFilter = evt => setFilter(evt.currentTarget.value);
 
-  toggleModal = () => {
-    this.setState(prevState => ({
-      showModal: !prevState.showModal,
-    }));
-  };
+  const toggleModal = () => setShowModal(prev => !prev);
 
-  render() {
-    const { contacts, filter } = this.state;
+  const getVisibleContacts = () => {
     const normalizedFilter = filter.toLowerCase().trim();
-    const visibleContacts = contacts.filter(contact =>
+
+    return contacts.filter(contact =>
       contact.name.toLowerCase().includes(normalizedFilter)
     );
+  };
 
-    return (
-      <div>
-        <h1>Phonebook</h1>
-        <button type="button" onClick={this.toggleModal}>
-          Create contact
-        </button>
+  const visibleContacts = getVisibleContacts();
 
-        <h2>Contacts</h2>
-        <Filter value={filter} onSearch={this.handleFilter} />
-        <ContactList
-          contacts={visibleContacts}
-          onDeleteContact={this.deleteContact}
-        />
-        {this.state.showModal && (
-          <Modal onClose={this.toggleModal}>
-            <ContactForm onSubmit={this.addContact} />
-          </Modal>
-        )}
-      </div>
-    );
-  }
+  return (
+    <div>
+      <h1>Phonebook</h1>
+      <button type="button" onClick={toggleModal}>
+        Create contact
+      </button>
+
+      <h2>Contacts</h2>
+      <Filter value={filter} onSearch={handleFilter} />
+      <ContactList contacts={visibleContacts} onDeleteContact={deleteContact} />
+      {showModal && (
+        <Modal onClose={toggleModal}>
+          <ContactForm onSubmit={addContact} />
+        </Modal>
+      )}
+    </div>
+  );
 }
 
-export default App;
