@@ -1,15 +1,19 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Backdrop, Content } from './Modal.styled';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleModal } from 'redux/modalSlice';
 
 const modalRoot = document.querySelector('#modal-root');
 
-export default function Modal({ onClose, children }) {
+export default function Modal({ children }) {
+  const dispatch = useDispatch();
+  const modal = useSelector(state => state.modal);
 
   useEffect(() => {
     const onKeydownEsc = evt => {
       if (evt.code === 'Escape') {
-        onClose();
+        dispatch(toggleModal(modal));
       }
     };
 
@@ -17,13 +21,12 @@ export default function Modal({ onClose, children }) {
 
     return () => {
       window.removeEventListener('keydown', onKeydownEsc);
-    }
-  }, [onClose])
-  
+    };
+  }, [dispatch, modal]);
 
   const handleBackdropClick = evt => {
     if (evt.currentTarget === evt.target) {
-      onClose();
+      dispatch(toggleModal(modal));
     }
   };
 
@@ -31,7 +34,7 @@ export default function Modal({ onClose, children }) {
     <Backdrop onClick={handleBackdropClick}>
       <Content>
         {children}
-        <button type="button" onClick={onClose}>
+        <button type="button" onClick={() => dispatch(toggleModal(modal))}>
           Close
         </button>
       </Content>
@@ -39,4 +42,3 @@ export default function Modal({ onClose, children }) {
     modalRoot
   );
 }
-

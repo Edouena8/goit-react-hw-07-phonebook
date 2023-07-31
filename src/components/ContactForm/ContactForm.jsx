@@ -1,6 +1,8 @@
 import { Field, Form, Formik, ErrorMessage } from 'formik';
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
+import { addContact } from 'redux/contactsSlice';
+import { toggleModal } from 'redux/modalSlice';
 
 const SignupSchema = Yup.object().shape({
   name: Yup.string(
@@ -20,9 +22,26 @@ const initialValues = {
   number: '',
 };
 
-const ContactForm = ({ onSubmit }) => {
+const ContactForm = () => {
+  const contacts = useSelector(state => state.contacts);
+  const modal = useSelector(state => state.modal);
+  const dispatch = useDispatch();
+
+  const duplicateContact = name => {
+    const normalizedName = name.toLowerCase().trim();
+
+    return contacts.some(
+      contact => contact.name.toLowerCase() === normalizedName
+    );
+  };
+
   const handleSubmit = ({ name, number }, { resetForm }) => {
-    onSubmit(name, number);
+    if (duplicateContact(name)) {
+      return alert(`${name} is already in contacts`);
+    }
+
+    dispatch(addContact({ name, number }));
+    dispatch(toggleModal(modal));
     resetForm();
   };
 
@@ -49,10 +68,6 @@ const ContactForm = ({ onSubmit }) => {
       </Form>
     </Formik>
   );
-};
-
-ContactForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
 };
 
 export default ContactForm;

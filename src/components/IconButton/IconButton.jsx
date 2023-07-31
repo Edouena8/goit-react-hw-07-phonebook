@@ -1,22 +1,29 @@
 import PropTypes from 'prop-types';
 import { IconBtn } from './IconButton.styled';
+import { useDispatch } from 'react-redux';
+import { deleteContact } from 'redux/contactsSlice';
 
+const IconButton = ({ children, id, ...allyProps }) => {
+  const dispatch = useDispatch();
 
-const IconButton = ({ children, onClick, ...allyProps }) => (
-    <IconBtn type="button" onClick={onClick} {...allyProps}>
-        {children}
+  return (
+    <IconBtn
+      type="button"
+      onClick={() => dispatch(deleteContact(id))}
+      {...allyProps}
+    >
+      {children}
     </IconBtn>
-);
+  );
+};
 
 IconButton.defaultProps = {
-    onClick: () => null,
-    children: null,
+  children: null,
 };
 
 IconButton.propTypes = {
-    children: PropTypes.node,
-    onClick: PropTypes.func,
-    'aria-label': PropTypes.string.isRequired,
+  children: PropTypes.node,
+  'aria-label': PropTypes.string.isRequired,
 };
 
 export default IconButton;
