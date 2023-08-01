@@ -6,18 +6,23 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toggleModal } from 'redux/modalSlice';
 import { useEffect } from 'react';
 import { fetchContacts } from 'redux/operation';
-import { getContacts, getError, getIsLoading, getModal } from 'redux/selectors';
+import {
+  selectContacts,
+  selectError,
+  selectIsLoading,
+  selectModal,
+} from 'redux/selectors';
 
 export default function App() {
-  const modal = useSelector(getModal);
-  const items = useSelector(getContacts);
-  const isLoading = useSelector(getIsLoading);
-  const error = useSelector(getError);
   const dispatch = useDispatch();
+  const modal = useSelector(selectModal);
+  const items = useSelector(selectContacts);
+  const isLoading = useSelector(selectIsLoading);
+  const error = useSelector(selectError);
 
   useEffect(() => {
     dispatch(fetchContacts());
-  }, [dispatch])
+  }, [dispatch]);
 
   return (
     <div>

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
 import { toggleModal } from 'redux/modalSlice';
 import { addContact } from 'redux/operation';
-import { getContacts, getModal } from 'redux/selectors';
+import { selectContacts, selectModal } from 'redux/selectors';
 
 const SignupSchema = Yup.object().shape({
   name: Yup.string(
@@ -24,8 +24,8 @@ const initialValues = {
 };
 
 const ContactForm = () => {
-  const contacts = useSelector(getContacts);
-  const modal = useSelector(getModal);
+  const contacts = useSelector(selectContacts);
+  const modal = useSelector(selectModal);
   const dispatch = useDispatch();
 
   const duplicateContact = name => {
