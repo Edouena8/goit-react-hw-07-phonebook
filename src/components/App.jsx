@@ -4,10 +4,20 @@ import Filter from './Filter/Filter';
 import Modal from './Modal/Modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleModal } from 'redux/modalSlice';
+import { useEffect } from 'react';
+import { fetchContacts } from 'redux/operation';
+import { getContacts, getError, getIsLoading, getModal } from 'redux/selectors';
 
 export default function App() {
-  const modal = useSelector(state => state.modal);
+  const modal = useSelector(getModal);
+  const items = useSelector(getContacts);
+  const isLoading = useSelector(getIsLoading);
+  const error = useSelector(getError);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch])
 
   return (
     <div>
@@ -17,7 +27,9 @@ export default function App() {
       </button>
 
       <h2>Contacts</h2>
-      <Filter />
+      {isLoading && !error && <b>Request in progress...</b>}
+      {error && <p>{error}</p>}
+      {items && <Filter />}
       <ContactList />
       {modal && (
         <Modal>

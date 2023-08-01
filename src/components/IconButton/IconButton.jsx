@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { IconBtn } from './IconButton.styled';
 import { useDispatch } from 'react-redux';
-import { deleteContact } from 'redux/contactsSlice';
+import { deleteContact } from 'redux/operation';
 
 const IconButton = ({ children, id, ...allyProps }) => {
   const dispatch = useDispatch();

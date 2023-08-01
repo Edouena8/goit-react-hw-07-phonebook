@@ -1,15 +1,16 @@
 import { Field, Form, Formik, ErrorMessage } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
-import { addContact } from 'redux/contactsSlice';
 import { toggleModal } from 'redux/modalSlice';
+import { addContact } from 'redux/operation';
+import { getContacts, getModal } from 'redux/selectors';
 
 const SignupSchema = Yup.object().shape({
   name: Yup.string(
     "Name main y contaonly letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
   ).required('Name is a required field'),
 
-  number: Yup.string(
+  phone: Yup.string(
     'Phone number must be digits and can contain spaces, dashes, parentheses and can start with +'
   )
     .min(3, 'Number must be at least 3 characters!')
@@ -19,12 +20,12 @@ const SignupSchema = Yup.object().shape({
 
 const initialValues = {
   name: '',
-  number: '',
+  phone: '',
 };
 
 const ContactForm = () => {
-  const contacts = useSelector(state => state.contacts);
-  const modal = useSelector(state => state.modal);
+  const contacts = useSelector(getContacts);
+  const modal = useSelector(getModal);
   const dispatch = useDispatch();
 
   const duplicateContact = name => {
@@ -35,12 +36,12 @@ const ContactForm = () => {
     );
   };
 
-  const handleSubmit = ({ name, number }, { resetForm }) => {
+  const handleSubmit = ({ name, phone }, { resetForm }) => {
     if (duplicateContact(name)) {
       return alert(`${name} is already in contacts`);
     }
 
-    dispatch(addContact({ name, number }));
+    dispatch(addContact({ name, phone }));
     dispatch(toggleModal(modal));
     resetForm();
   };
@@ -60,8 +61,8 @@ const ContactForm = () => {
 
         <label>
           Number
-          <Field type="tel" name="number" />
-          <ErrorMessage name="number" component="p" />
+          <Field type="tel" name="phone" />
+          <ErrorMessage name="phone" component="p" />
         </label>
 
         <button type="submit">Add contact</button>

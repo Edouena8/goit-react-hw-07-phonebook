@@ -3,12 +3,13 @@ import { createPortal } from 'react-dom';
 import { Backdrop, Content } from './Modal.styled';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleModal } from 'redux/modalSlice';
+import { getModal } from 'redux/selectors';
 
 const modalRoot = document.querySelector('#modal-root');
 
 export default function Modal({ children }) {
   const dispatch = useDispatch();
-  const modal = useSelector(state => state.modal);
+  const modal = useSelector(getModal);
 
   useEffect(() => {
     const onKeydownEsc = evt => {

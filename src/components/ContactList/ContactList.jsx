@@ -1,13 +1,14 @@
 import IconButton from 'components/IconButton/IconButton';
 import { ReactComponent as DeleteIcon } from '../../icons/delete.svg';
 import { useSelector } from 'react-redux';
+import { getContacts, getFilter } from 'redux/selectors';
 
 const ContactList = () => {
-  const contacts = useSelector(state => state.contacts);
-  const filter = useSelector(state => state.filter);
+  const contacts = useSelector(getContacts);
+  const filter = useSelector(getFilter);
 
   const getVisibleContacts = () => {
-    const normalizedFilter = filter.toLowerCase().trim();
+    const normalizedFilter = filter.toLowerCase().trim(); 
   
     return contacts.filter(contact =>
       contact.name.toLowerCase().includes(normalizedFilter)
@@ -18,10 +19,10 @@ const ContactList = () => {
 
   return (
     <ul>
-      {visibleContacts.map(({ id, name, number }) => (
+      {visibleContacts.map(({ id, name, phone }) => (
         <li key={id}>
           <p>
-            {name}: {number}
+            {name}: {phone}
           </p>
           <IconButton
             id={id}
