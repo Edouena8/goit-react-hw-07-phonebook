@@ -1,9 +1,18 @@
-import { Field, Form, Formik, ErrorMessage } from 'formik';
+import { toast } from 'react-toastify';
+import { Formik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
 import { toggleModal } from 'redux/modalSlice';
 import { addContact } from 'redux/operation';
 import { selectContacts, selectModal } from 'redux/selectors';
+import {
+  ErrorText,
+  FormInput,
+  FormWrap,
+  LabelText,
+  LabelWrap,
+  ModalBtn,
+} from './ContactForm.styled';
 
 const SignupSchema = Yup.object().shape({
   name: Yup.string(
@@ -14,7 +23,7 @@ const SignupSchema = Yup.object().shape({
     'Phone number must be digits and can contain spaces, dashes, parentheses and can start with +'
   )
     .min(3, 'Number must be at least 3 characters!')
-    .max(10, 'Number must be at most 10 characters!')
+    .max(12, 'Number must be at most 10 characters!')
     .required('Number is a required field'),
 });
 
@@ -38,10 +47,15 @@ const ContactForm = () => {
 
   const handleSubmit = ({ name, phone }, { resetForm }) => {
     if (duplicateContact(name)) {
-      return alert(`${name} is already in contacts`);
+      return toast.error(`${name} is already in contacts`, {
+        autoClose: 3000,
+      });
     }
 
     dispatch(addContact({ name, phone }));
+    toast.success(`Contact ${name} added successfully!`, {
+      autoClose: 3000,
+    });
     dispatch(toggleModal(modal));
     resetForm();
   };
@@ -52,21 +66,26 @@ const ContactForm = () => {
       validationSchema={SignupSchema}
       onSubmit={handleSubmit}
     >
-      <Form>
-        <label>
-          Name
-          <Field type="text" name="name" />
-          <ErrorMessage name="name" component="p" />
-        </label>
+      <FormWrap>
+        <LabelWrap>
+          <LabelText>Name</LabelText>
+          <FormInput type="text" name="name" />
+          <ErrorText name="name" component="p" />
+        </LabelWrap>
 
-        <label>
-          Number
-          <Field type="tel" name="phone" />
-          <ErrorMessage name="phone" component="p" />
-        </label>
+        <LabelWrap>
+          <LabelText>Number</LabelText>
+          <FormInput type="tel" name="phone" />
+          <ErrorText name="phone" component="p" />
+        </LabelWrap>
 
-        <button type="submit">Add contact</button>
-      </Form>
+        <div>
+          <ModalBtn type="submit">Add contact</ModalBtn>
+          <ModalBtn type="button" onClick={() => dispatch(toggleModal(modal))}>
+            Close
+          </ModalBtn>
+        </div>
+      </FormWrap>
     </Formik>
   );
 };

@@ -35,9 +35,6 @@ export default function Modal({ children }) {
     <Backdrop onClick={handleBackdropClick}>
       <Content>
         {children}
-        <button type="button" onClick={() => dispatch(toggleModal(modal))}>
-          Close
-        </button>
       </Content>
     </Backdrop>,
     modalRoot
